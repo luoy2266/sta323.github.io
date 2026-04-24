@@ -3,64 +3,840 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Survival Analysis Report</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Survival Analysis of Customer Churn</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #1f3c88;
+      --primary-2: #3156b3;
+      --border: #e5e7eb;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --code-bg: #f3f4f6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.7;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    a {
+      color: var(--primary-2);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--primary), #274690);
+      color: #fff;
+      padding: 56px 20px 42px;
+    }
+
+    .hero-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .hero h1 {
+      margin: 0 0 12px;
+      font-size: 2.5rem;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 860px;
+      font-size: 1.05rem;
+      opacity: 0.95;
+    }
+
+    .topnav {
+      margin-top: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .topnav a {
+      color: #fff;
+      font-weight: 700;
+      opacity: 0.95;
+    }
+
+    .layout {
+      max-width: 1080px;
+      margin: 28px auto 40px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 24px;
+    }
+
+    .sidebar,
+    .content {
+      min-width: 0;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar .card {
+      position: sticky;
+      top: 20px;
+      padding: 20px;
+    }
+
+    .sidebar h2 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+    }
+
+    .toc {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .toc li {
+      margin: 8px 0;
+    }
+
+    .toc a {
+      color: var(--text);
+      font-size: 0.96rem;
+    }
+
+    .content .card {
+      padding: 28px;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      background: #eef2ff;
+      border: 1px solid #dbe4ff;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      color: #334155;
+    }
+
+    h2, h3, h4 {
+      color: #111827;
+      margin-top: 32px;
+      margin-bottom: 12px;
+      scroll-margin-top: 90px;
+    }
+
+    h2 {
+      font-size: 1.6rem;
+      border-bottom: 2px solid #eef2f7;
+      padding-bottom: 8px;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+    }
+
+    p {
+      margin: 12px 0;
+    }
+
+    ul, ol {
+      padding-left: 22px;
+    }
+
+    code {
+      background: var(--code-bg);
+      border-radius: 6px;
+      padding: 2px 6px;
+      font-size: 0.95em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0 26px;
+      font-size: 0.96rem;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f8fafc;
+    }
+
+    .figure {
+      margin: 22px 0 28px;
+      text-align: center;
+    }
+
+    .figure img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      background: #fff;
+    }
+
+    .caption {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-style: italic;
+    }
+
+    .footer {
+      max-width: 1080px;
+      margin: 0 auto 40px;
+      padding: 0 20px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar .card {
+        position: static;
+      }
+
+      .hero h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
 </head>
 <body>
   <header class="hero">
-    <div class="container">
-      <h1>Survival Analysis Report</h1>
-      <p class="subtitle">STA323 Project 1 - Task Q2(2)</p>
-      <nav>
+    <div class="hero-inner">
+      <h1>Q2(2): Survival Analysis of Customer Churn</h1>
+      <p>
+        A blog-style report for STA323 Project 1, covering cohort construction,
+        Kaplan-Meier estimation, log-rank tests, Cox proportional hazards modeling,
+        AFT modeling, and a customer lifetime value extension.
+      </p>
+      <nav class="topnav">
         <a href="index.html">Home</a>
-        <a href="survival-analysis.html">Blog</a>
+        <a href="#introduction">Introduction</a>
+        <a href="#findings">Main Findings</a>
       </nav>
     </div>
   </header>
 
-  <main class="container">
-    <section class="card">
-      <h2>1. Background</h2>
-      <p>
-        Survival analysis is a statistical method used to study the time until an event occurs.
-        In this project, I followed the official Spark / Databricks case tutorial and reproduced
-        the analysis process step by step.
-      </p>
-    </section>
+  <main class="layout">
+    <aside class="sidebar">
+      <div class="card">
+        <h2>Contents</h2>
+        <ul class="toc">
+          <li><a href="#introduction">1. Introduction</a></li>
+          <li><a href="#dataset">2. Dataset and Cohort Construction</a></li>
+          <li><a href="#methodology">3. Methodology</a></li>
+          <li><a href="#km">4. Kaplan-Meier Analysis</a></li>
+          <li><a href="#grouped-km">5. Grouped KM and Log-Rank Tests</a></li>
+          <li><a href="#cox">6. Cox Proportional Hazards Model</a></li>
+          <li><a href="#ph">7. PH Assumption Check</a></li>
+          <li><a href="#aft">8. AFT Model</a></li>
+          <li><a href="#aft-diagnostics">9. AFT Diagnostic Plots</a></li>
+          <li><a href="#clv">10. Customer Lifetime Value</a></li>
+          <li><a href="#findings">11. Main Findings</a></li>
+        </ul>
+      </div>
+    </aside>
 
-    <section class="card">
-      <h2>2. Data and Preprocessing</h2>
-      <p>
-        This section describes the dataset source, feature construction, data cleaning,
-        and the way survival-related variables were defined.
-      </p>
-    </section>
+    <section class="content">
+      <article class="card">
+        <div class="meta">
+          <span class="badge">STA323 Project 1</span>
+          <span class="badge">Survival Analysis</span>
+          <span class="badge">Customer Churn</span>
+          <span class="badge">PySpark Case Study</span>
+        </div>
 
-    <section class="card">
-      <h2>3. Methodology</h2>
-      <p>
-        I used PySpark to reproduce the workflow and analyzed the time-to-event process
-        based on the tutorial. Relevant code blocks and outputs were recorded in the notebook.
-      </p>
-    </section>
+        <h2 id="introduction">1. Introduction</h2>
+        <p>
+          The goal of this project is to study customer churn as a <strong>time-to-event problem</strong>.
+          In this setting, the event of interest is customer churn, the time variable is customer tenure
+          measured in months, and customers who have not churned by the end of the observation window are
+          treated as <strong>right-censored observations</strong>.
+        </p>
+        <p>The main workflow included:</p>
+        <ul>
+          <li>Kaplan-Meier estimation for overall and subgroup survival curves</li>
+          <li>Log-rank tests for comparing survival curves</li>
+          <li>Cox Proportional Hazards modeling for multi-variable risk analysis</li>
+          <li>Log-Logistic Accelerated Failure Time (AFT) modeling as a parametric alternative</li>
+          <li>A survival-based customer lifetime value (CLV) extension</li>
+        </ul>
 
-    <section class="card">
-      <h2>4. Results</h2>
-      <p>
-        Replace this section with your real analysis results, figures, tables, and interpretations.
-      </p>
-    </section>
+        <h2 id="dataset">2. Dataset and Cohort Construction</h2>
+        <p>
+          The original dataset is the IBM Telco Customer Churn dataset stored in
+          <code>Telco-Customer-Churn.csv</code>.
+        </p>
 
-    <section class="card">
-      <h2>5. Conclusion</h2>
-      <p>
-        Summarize the main findings of your survival analysis here.
-      </p>
+        <h3>2.1 Raw dataset</h3>
+        <p>
+          The notebook first loaded the full CSV file with Spark and then cleaned the columns.
+        </p>
+        <p><strong>Raw row count:</strong> 7,043 customers</p>
+
+        <h3>2.2 Preprocessing steps</h3>
+        <ol>
+          <li>All CSV columns were read as strings first to avoid type-inference problems.</li>
+          <li>Important numeric fields such as <code>tenure</code>, <code>MonthlyCharges</code>, and <code>TotalCharges</code> were cast to numeric types.</li>
+          <li>
+            A binary event variable <code>churn_event</code> was created:
+            <ul>
+              <li><code>1</code> = the customer churned</li>
+              <li><code>0</code> = the customer did not churn during the observation period</li>
+            </ul>
+          </li>
+          <li>
+            The analysis cohort was restricted to:
+            <ul>
+              <li>customers with <strong>Month-to-month</strong> contracts</li>
+              <li>customers with an active internet service (<code>internet_service != 'No'</code>)</li>
+              <li>rows with non-missing <code>tenure</code>, <code>monthly_charges</code>, and <code>total_charges</code></li>
+            </ul>
+          </li>
+        </ol>
+        <p>
+          This filtering step was important because it aligned the cohort with the business problem:
+          short-cycle churn behavior among active service users.
+        </p>
+
+        <h3>2.3 Final analysis cohort</h3>
+        <p>After filtering, the final cohort contained <strong>3,351 customers</strong>.</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>churn_event</th>
+              <th>Meaning</th>
+              <th>Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>0</td>
+              <td>right-censored (still active)</td>
+              <td>1,795</td>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>churned</td>
+              <td>1,556</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2 id="methodology">3. Methodology</h2>
+
+        <h3>3.1 Why survival analysis?</h3>
+        <p>
+          A standard classification model only predicts whether a customer will churn.
+          Survival analysis is more informative because it also models <strong>when</strong> churn is likely to happen.
+          This is useful in customer-retention problems because timing matters:
+          a customer who churns after 2 months is very different from one who churns after 30 months.
+        </p>
+
+        <h3>3.2 Duration and event variables</h3>
+        <p>Define:</p>
+        <ul>
+          <li><code>T_values = tenure</code>: the observed customer lifetime in months</li>
+          <li><code>E_values = churn_event</code>: whether churn occurred during observation</li>
+        </ul>
+        <p>
+          The Kaplan-Meier, Cox, and AFT models all use these two variables as the core survival-analysis inputs.
+        </p>
+
+        <h2 id="km">4. Kaplan-Meier Analysis</h2>
+
+        <h3>4.1 Overall Kaplan-Meier curve</h3>
+        <p>
+          The Kaplan-Meier estimator was used to estimate the survival function for the entire cohort.
+          The survival function <code>S(t)</code> gives the probability that a customer survives
+          and does not churn beyond time <code>t</code>.
+        </p>
+        <p><strong>Result:</strong></p>
+        <ul>
+          <li><strong>Median survival time = 34.00 months</strong></li>
+        </ul>
+        <p>
+          This means that, for the filtered cohort, the estimated probability of remaining active
+          falls to about 0.5 at roughly 34 months.
+        </p>
+
+        <div class="figure">
+          <img src="report_figures/figure_1_overall_km.png" alt="Figure 1. Overall Kaplan-Meier survival curve">
+          <div class="caption">Figure 1. Overall Kaplan-Meier survival curve for the filtered month-to-month internet-service cohort.</div>
+        </div>
+
+        <h3>4.2 Interpretation</h3>
+        <p>
+          The overall Kaplan-Meier curve shows that survival probability decreases gradually over time,
+          which is expected in a customer-churn setting. The confidence interval widens at later months
+          because fewer customers remain under observation in the tail of the curve.
+        </p>
+
+        <h2 id="grouped-km">5. Grouped Kaplan-Meier Curves and Log-Rank Tests</h2>
+        <p>
+          To understand which customer characteristics are associated with different churn behavior,
+          the notebook plotted Kaplan-Meier curves by subgroup and then ran log-rank tests.
+        </p>
+
+        <h3>5.1 Online security</h3>
+        <div class="figure">
+          <img src="report_figures/figure_2_km_online_security.png" alt="Figure 2. Kaplan-Meier curves by online security">
+          <div class="caption">Figure 2. Kaplan-Meier survival curves grouped by online security. Customers with online security show consistently higher survival probabilities.</div>
+        </div>
+        <p><strong>Log-rank test p-value:</strong> <code>0.000000</code></p>
+        <p>
+          The survival curves for customers with and without online security were clearly different.
+          Customers with online security had a higher survival probability over time, indicating better retention.
+        </p>
+
+        <h3>5.2 Tech support</h3>
+        <div class="figure">
+          <img src="report_figures/figure_3_km_tech_support.png" alt="Figure 3. Kaplan-Meier curves by tech support">
+          <div class="caption">Figure 3. Kaplan-Meier survival curves grouped by tech support. Tech support is associated with better retention over time.</div>
+        </div>
+        <p><strong>Log-rank test p-value:</strong> <code>0.000000</code></p>
+        <p>
+          The survival curves for customers with and without tech support were also clearly separated.
+          Customers with tech support showed stronger retention over time.
+        </p>
+
+        <h3>5.3 Gender</h3>
+        <div class="figure">
+          <img src="report_figures/figure_4_km_gender.png" alt="Figure 4. Kaplan-Meier curves by gender">
+          <div class="caption">Figure 4. Kaplan-Meier survival curves grouped by gender. The curves are much closer together, which matches the non-significant log-rank test result.</div>
+        </div>
+        <p><strong>Log-rank test p-value:</strong> <code>0.153317</code></p>
+        <p>
+          Gender did not produce a statistically significant difference in survival curves at the 5% level.
+        </p>
+
+        <h3>5.4 Summary of subgroup tests</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>p-value</th>
+              <th>Interpretation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>online_security</td>
+              <td>0.000000</td>
+              <td>strong evidence that the survival curves differ</td>
+            </tr>
+            <tr>
+              <td>tech_support</td>
+              <td>0.000000</td>
+              <td>strong evidence that the survival curves differ</td>
+            </tr>
+            <tr>
+              <td>gender</td>
+              <td>0.153317</td>
+              <td>no strong evidence of a survival difference</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          These results suggest that service-related variables are much more informative for churn timing
+          than demographic gender information in this cohort.
+        </p>
+
+        <h2 id="cox">6. Cox Proportional Hazards Model</h2>
+
+        <h3>6.1 Purpose of the Cox model</h3>
+        <p>
+          The Cox Proportional Hazards model was used to examine the effect of multiple covariates
+          on churn risk at the same time. The hazard can be interpreted as the instantaneous risk of churn,
+          conditional on having remained active up to that time.
+        </p>
+        <p>The notebook included the following predictors:</p>
+        <ul>
+          <li><code>dependents_Yes</code></li>
+          <li><code>internet_service_DSL</code></li>
+          <li><code>online_backup_Yes</code></li>
+          <li><code>tech_support_Yes</code></li>
+          <li><code>paperless_billing_Yes</code></li>
+        </ul>
+
+        <h3>6.2 Cox results</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>Coefficient</th>
+              <th>Hazard Ratio <code>exp(coef)</code></th>
+              <th>p-value</th>
+              <th>Interpretation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>dependents_Yes</td>
+              <td>-0.319851</td>
+              <td>0.726257</td>
+              <td>6.526522e-06</td>
+              <td>customers with dependents have lower churn risk</td>
+            </tr>
+            <tr>
+              <td>internet_service_DSL</td>
+              <td>-0.196007</td>
+              <td>0.822006</td>
+              <td>1.015562e-03</td>
+              <td>DSL users have lower churn risk than the comparison group</td>
+            </tr>
+            <tr>
+              <td>online_backup_Yes</td>
+              <td>-0.785194</td>
+              <td>0.456031</td>
+              <td>4.578070e-40</td>
+              <td>online backup is strongly associated with lower churn risk</td>
+            </tr>
+            <tr>
+              <td>tech_support_Yes</td>
+              <td>-0.636002</td>
+              <td>0.529405</td>
+              <td>3.069026e-17</td>
+              <td>tech support is strongly associated with lower churn risk</td>
+            </tr>
+            <tr>
+              <td>paperless_billing_Yes</td>
+              <td>0.145916</td>
+              <td>1.157099</td>
+              <td>1.872582e-02</td>
+              <td>paperless billing is associated with slightly higher churn risk</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>6.3 Interpretation of hazard ratios</h3>
+        <p>
+          A hazard ratio below 1 means the variable is associated with a lower churn hazard.
+          A hazard ratio above 1 means the variable is associated with a higher churn hazard.
+        </p>
+        <p>The strongest protective effects in this model came from:</p>
+        <ul>
+          <li><strong>online backup</strong> (<code>HR = 0.456</code>)</li>
+          <li><strong>tech support</strong> (<code>HR = 0.529</code>)</li>
+          <li><strong>having dependents</strong> (<code>HR = 0.726</code>)</li>
+        </ul>
+        <p>
+          The only variable that increased churn hazard in this fitted Cox model was
+          <strong>paperless billing</strong> (<code>HR = 1.157</code>).
+          A possible business interpretation is that customers using paperless billing may overlap
+          with more digital, price-sensitive, or short-term customer segments, although this interpretation
+          would need further validation.
+        </p>
+
+        <h2 id="ph">7. Proportional Hazards Assumption Check</h2>
+        <p>
+          The Cox model relies on the <strong>proportional hazards assumption</strong>,
+          which means the relative hazard between groups should stay approximately stable over time.
+        </p>
+        <p>
+          We evaluated this assumption using a proportional-hazards test and log-log survival plots.
+        </p>
+
+        <h3>7.1 Test results</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>Test statistic</th>
+              <th>p-value</th>
+              <th>Interpretation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>dependents_Yes</td>
+              <td>0.849016</td>
+              <td>3.568309e-01</td>
+              <td>no strong violation detected</td>
+            </tr>
+            <tr>
+              <td>internet_service_DSL</td>
+              <td>24.407959</td>
+              <td>7.794601e-07</td>
+              <td>possible violation</td>
+            </tr>
+            <tr>
+              <td>online_backup_Yes</td>
+              <td>16.553075</td>
+              <td>4.730721e-05</td>
+              <td>possible violation</td>
+            </tr>
+            <tr>
+              <td>tech_support_Yes</td>
+              <td>2.337874</td>
+              <td>1.262618e-01</td>
+              <td>no strong violation detected</td>
+            </tr>
+            <tr>
+              <td>paperless_billing_Yes</td>
+              <td>13.908217</td>
+              <td>1.919575e-04</td>
+              <td>possible violation</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>7.2 Interpretation</h3>
+        <div class="figure">
+          <img src="report_figures/figure_5_ph_dependents.png" alt="Figure 5. Log-log survival curves by dependents">
+          <div class="caption">Figure 5. Log-log survival curves by dependents.</div>
+        </div>
+
+        <div class="figure">
+          <img src="report_figures/figure_6_ph_internet_service.png" alt="Figure 6. Log-log survival curves by internet service">
+          <div class="caption">Figure 6. Log-log survival curves by internet service.</div>
+        </div>
+
+        <div class="figure">
+          <img src="report_figures/figure_7_ph_online_backup.png" alt="Figure 7. Log-log survival curves by online backup">
+          <div class="caption">Figure 7. Log-log survival curves by online backup.</div>
+        </div>
+
+        <div class="figure">
+          <img src="report_figures/figure_8_ph_tech_support.png" alt="Figure 8. Log-log survival curves by tech support">
+          <div class="caption">Figure 8. Log-log survival curves by tech support.</div>
+        </div>
+
+        <p>
+          The proportional-hazards assumption appears reasonable for <code>dependents_Yes</code> and
+          <code>tech_support_Yes</code>, but potential violations were detected for
+          <code>internet_service_DSL</code>, <code>online_backup_Yes</code>, and
+          <code>paperless_billing_Yes</code>. This suggests that a pure Cox interpretation may not fully
+          capture all time-varying behavior in the data.
+        </p>
+        <p>
+          For this reason, we also fit a parametric AFT model as a complementary analysis.
+        </p>
+
+        <h2 id="aft">8. Accelerated Failure Time (AFT) Model</h2>
+
+        <h3>8.1 Why use an AFT model?</h3>
+        <p>
+          The AFT model provides an alternative survival-modeling perspective. Instead of modeling hazard directly,
+          it models the survival time itself. In this notebook, a <strong>Log-Logistic AFT</strong> model was used.
+        </p>
+        <p>
+          In an AFT model, positive coefficients generally indicate that a variable stretches customer survival time,
+          while negative coefficients would suggest shorter survival time.
+        </p>
+
+        <h3>8.2 AFT results</h3>
+        <p>We used the following encoded predictors in order:</p>
+        <ul>
+          <li><code>partner_Yes</code></li>
+          <li><code>multiple_lines_Yes</code></li>
+          <li><code>internet_service_DSL</code></li>
+          <li><code>online_security_Yes</code></li>
+          <li><code>online_backup_Yes</code></li>
+          <li><code>device_protection_Yes</code></li>
+          <li><code>tech_support_Yes</code></li>
+          <li><code>payment_method_Bank transfer (automatic)</code></li>
+          <li><code>payment_method_Credit card (automatic)</code></li>
+        </ul>
+
+        <p>
+          The fitted AFT summary showed positive coefficients for all selected service and payment covariates included
+          in the model output. The exponentiated coefficients were all greater than 1, which is consistent with longer
+          expected survival times for these customer profiles.
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Term (in notebook model order)</th>
+              <th>Coefficient</th>
+              <th><code>exp(coef)</code></th>
+              <th>p-value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>partner_Yes</td>
+              <td>0.484055</td>
+              <td>1.622641</td>
+              <td>6.108834e-12</td>
+            </tr>
+            <tr>
+              <td>multiple_lines_Yes</td>
+              <td>0.383733</td>
+              <td>1.467754</td>
+              <td>6.313886e-07</td>
+            </tr>
+            <tr>
+              <td>internet_service_DSL</td>
+              <td>0.662820</td>
+              <td>1.940255</td>
+              <td>5.231488e-22</td>
+            </tr>
+            <tr>
+              <td>online_security_Yes</td>
+              <td>0.812815</td>
+              <td>2.254245</td>
+              <td>2.781651e-31</td>
+            </tr>
+            <tr>
+              <td>online_backup_Yes</td>
+              <td>0.861583</td>
+              <td>2.366904</td>
+              <td>4.368206e-24</td>
+            </tr>
+            <tr>
+              <td>device_protection_Yes</td>
+              <td>0.676767</td>
+              <td>1.967506</td>
+              <td>1.737989e-24</td>
+            </tr>
+            <tr>
+              <td>tech_support_Yes</td>
+              <td>0.739827</td>
+              <td>2.095573</td>
+              <td>8.452904e-16</td>
+            </tr>
+            <tr>
+              <td>payment_method_Bank transfer (automatic)</td>
+              <td>0.799044</td>
+              <td>2.223415</td>
+              <td>6.334807e-17</td>
+            </tr>
+            <tr>
+              <td>payment_method_Credit card (automatic)</td>
+              <td>0.689300</td>
+              <td>1.992320</td>
+              <td>2.752017e-15</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p><strong>Median survival time on the original month scale = 135.51 months</strong></p>
+
+        <h3>8.3 Interpretation</h3>
+        <p>
+          The AFT results are broadly consistent with the earlier Kaplan-Meier and Cox findings:
+          support-oriented and value-added services are associated with longer customer survival.
+          The large estimated median survival time from the AFT model should be interpreted carefully
+          because it is model-based and depends on the parametric distributional assumption.
+        </p>
+
+        <h2 id="aft-diagnostics">9. AFT Diagnostic Plots</h2>
+
+        <div class="figure">
+          <img src="report_figures/figure_9_aft_partner.png" alt="Figure 9. AFT diagnostic plot by partner">
+          <div class="caption">Figure 9. AFT diagnostic plot by partner.</div>
+        </div>
+
+        <div class="figure">
+          <img src="report_figures/figure_10_aft_internet_service.png" alt="Figure 10. AFT diagnostic plot by internet service">
+          <div class="caption">Figure 10. AFT diagnostic plot by internet service.</div>
+        </div>
+
+        <div class="figure">
+          <img src="report_figures/figure_11_aft_tech_support.png" alt="Figure 11. AFT diagnostic plot by tech support">
+          <div class="caption">Figure 11. AFT diagnostic plot by tech support.</div>
+        </div>
+
+        <p>
+          These plots compared <code>log(time)</code> against <code>log((1-S(t))/S(t))</code> for each group.
+          The purpose was to assess whether the Log-Logistic AFT assumption was reasonable.
+          If the transformed curves are approximately linear and reasonably parallel, then the chosen AFT
+          specification is more plausible.
+        </p>
+
+        <h2 id="clv">10. Customer Lifetime Value (CLV) Extension</h2>
+        <p>
+          The final section of the notebook translated survival predictions into business value.
+          The CLV logic was:
+        </p>
+        <ol>
+          <li>predict a customer’s survival probability over time using the fitted Cox model,</li>
+          <li>multiply survival probability by monthly profit to obtain expected monthly profit,</li>
+          <li>discount future profits using an annual discount rate,</li>
+          <li>accumulate discounted profits into cumulative net present value (NPV).</li>
+        </ol>
+
+        <div class="figure">
+          <img src="report_figures/figure_12_clv.png" alt="Figure 12. CLV">
+          <div class="caption">Figure 12. Survival and CLV curve for customer.</div>
+        </div>
+
+        <p>The CLV calculator allows the user to vary:</p>
+        <ul>
+          <li>whether the customer has dependents,</li>
+          <li>whether the customer uses DSL,</li>
+          <li>whether the customer has online backup,</li>
+          <li>whether the customer has tech support,</li>
+          <li>monthly profit,</li>
+          <li>annual discount rate.</li>
+        </ul>
+
+        <p>
+          This extension is valuable because it connects statistical survival analysis
+          with customer-retention economics.
+        </p>
+
+        <h2 id="findings">11. Main Findings</h2>
+        <ol>
+          <li>The <strong>median observed survival time</strong> from the Kaplan-Meier curve was <strong>34 months</strong>.</li>
+          <li><strong>Online security</strong> and <strong>tech support</strong> significantly improved customer survival, while <strong>gender</strong> did not show a significant effect.</li>
+          <li>In the Cox model, <strong>online backup</strong> and <strong>tech support</strong> were the strongest factors associated with lower churn hazard.</li>
+          <li>The proportional-hazards test suggested that some Cox covariates may have time-varying effects, especially <code>internet_service_DSL</code>, <code>online_backup_Yes</code>, and <code>paperless_billing_Yes</code>.</li>
+          <li>The Log-Logistic AFT model supports the same general business conclusion: service-related features are associated with longer customer survival.</li>
+          <li>The CLV section demonstrated how survival probabilities can be converted into discounted customer value for decision support.</li>
+        </ol>
+      </article>
     </section>
   </main>
 
-  <footer>
-    <p>© 2026 Yuan | Hosted with GitHub Pages</p>
+  <footer class="footer">
+    <p>© 2026 Yuan | Survival Analysis Blog | Hosted with GitHub Pages</p>
   </footer>
 </body>
 </html>
